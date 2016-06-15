@@ -6,3 +6,4 @@ class Config:
     vocab_size = None #Set when you load tok_map
     state_size = 256
     embed_size = 256
+    debug = False
