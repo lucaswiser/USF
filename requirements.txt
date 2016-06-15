@@ -1,0 +1,5 @@
+nltk==3.2.1
+numpy==1.10.4
+six==1.10.0
+tensorflow==0.8.0
+

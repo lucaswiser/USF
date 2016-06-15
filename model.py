@@ -94,7 +94,7 @@ class RNNModel():
                 cost, grad_norm, _  = session.run(fetches, feed_dict)
                 total_cost += cost
                 costs.append(cost)
-                print("%.3f cost: %.3f grad norm: %.3f speed: %.0f wps" %
+                print("%.3f cost: %.3f grad norm: %.3f speed: %.0f pages/sec" %
                     (step, cost, grad_norm,
                      (num_data_points / float(time() - t0))))
                 t0 = time()
