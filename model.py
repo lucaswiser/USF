@@ -46,9 +46,9 @@ class RNNModel():
                                                         sequence_length=self.lengths,
                                                         dtype=tf.float32)
         
-        #sent_out = tf.concat(1, [last_fw_state, last_bw_state])
-        sent_out = outputs[-1]
-        output_size = state_size*2
+        sent_out = tf.concat(1, [last_fw_state, last_bw_state])
+        #sent_out = outputs[-1]
+        output_size = state_size*4
 
         with tf.variable_scope("linear", reuse=None):
             w = tf.get_variable("w", [output_size, 1])
