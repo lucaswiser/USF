@@ -27,11 +27,11 @@ class TokReader():
     def _load(self):
         logger.info("Loading reviews")
         if self.training:
-            pos_files = [pos_train_dir + f for f in os.listdir(pos_dir)]
-            neg_files = [neg_train_dir + f for f in os.listdir(neg_dir)]
+            pos_files = [pos_train_dir + f for f in os.listdir(pos_train_dir)]
+            neg_files = [neg_train_dir + f for f in os.listdir(neg_train_dir)]
         else:
-            pos_files = [pos_test_dir + f for f in os.listdir(pos_dir)]
-            neg_files = [neg_test_dir + f for f in os.listdir(neg_dir)]            
+            pos_files = [pos_test_dir + f for f in os.listdir(pos_test_dir)]
+            neg_files = [neg_test_dir + f for f in os.listdir(neg_test_dir)]            
         data = []
         labels = []
         lengths = []
