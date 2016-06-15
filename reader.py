@@ -2,6 +2,7 @@ from collections import deque
 import numpy as np
 import os
 import logging
+import nltk
 logger = logging.getLogger("USF.reader")
 logger.setLevel(logging.DEBUG)
 neg_train_dir = 'aclImdb/train/neg/'
@@ -31,7 +32,7 @@ class TokReader():
             neg_files = [neg_train_dir + f for f in os.listdir(neg_train_dir)]
         else:
             pos_files = [pos_test_dir + f for f in os.listdir(pos_test_dir)]
-            neg_files = [neg_test_dir + f for f in os.listdir(neg_test_dir)]            
+            neg_files = [neg_test_dir + f for f in os.listdir(neg_test_dir)] 
         data = []
         labels = []
         lengths = []
@@ -60,7 +61,7 @@ class TokReader():
         logger.info("Suffling input data")
         inds = list(range(len(self.data)))
         if self.random:
-            np.random.suffle(inds)
+            np.random.shuffle(inds)
         inds = deque(inds)
         return inds
 
@@ -74,8 +75,8 @@ class TokReader():
                 sampled_index = inds.popleft()
                 x.append(self.data[sampled_index])
                 y.append(self.labels[sampled_index])
-                lengths.append(self.lenghts[sampled_index])
-            yield x, y, lengths
+                lengths.append(self.lengths[sampled_index])
+            yield np.array(x), np.array(y).reshape((-1,1)), np.array(lengths)
 
 
 class CharReader():

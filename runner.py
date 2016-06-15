@@ -11,10 +11,16 @@ from reader import TokReader
 import logging
 logger = logging.getLogger("USF")
 logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(asctime)s][%(name)s][%(levelname)s]: %(message)s')
+sh = logging.StreamHandler()
+sh.setLevel(logging.DEBUG)
+sh.setFormatter(formatter)
+logger.addHandler(sh)
 graph_path = 'graphs/'
 model_dir = "models/"
 with open('tok_map.pkl', 'rb') as f:
     tok_map = pickle.load(f)
+Config.vocab_size = len(tok_map)
 limit = 500 if Config.debug else None
 tokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, 
                       random=True, rounded=True, training=True, limit=limit)
@@ -60,7 +66,7 @@ def main(graph_path, continue_training=False, start_model=None, start_ind=0):
             merge = tf.merge_summary([summ1, summ2, summ3, summ4, summ5])
             writer.add_summary(merge.eval(), i)
             writer.flush()
-            if i % 5 == 0:
+            if i % 1 == 0:
                 saver.save(session, model_dir + 'saved-lstm-model', global_step=i)
             if len(last3) == 3:
                 h = max(last3)

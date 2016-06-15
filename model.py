@@ -18,7 +18,7 @@ class TokModel():
 
         self.input_data = tf.placeholder(tf.int32, [batch_size, sent_len])
         self.lengths = tf.placeholder(tf.int64, [batch_size])
-        self.targets = tf.placeholder(tf.float32, [batch_size])
+        self.targets = tf.placeholder(tf.float32, [batch_size, 1])
 
         # Get embedding layer which requires CPU
         with tf.device("/cpu:0"):
@@ -42,20 +42,20 @@ class TokModel():
 
             # Run the bidirectional rnn
             outputs, last_fw_state, last_bw_state = rnn.bidirectional_rnn(
-                                                        cell_1, backcell_1, rnn_splits,
-                                                        sequence_length=self.engths,
+                                                        cell, backcell, rnn_splits,
+                                                        sequence_length=self.lengths,
                                                         dtype=tf.float32)
         
-        sent_out = tf.concat(1, [last_fw_state, last_bw_state])
-        output_size = state_size*4
+        #sent_out = tf.concat(1, [last_fw_state, last_bw_state])
+        sent_out = outputs[-1]
+        output_size = state_size*2
 
         with tf.variable_scope("linear", reuse=None):
             w = tf.get_variable("w", [output_size, 1])
             b = tf.get_variable("b", [1])
-            raw_logits = [tf.matmul(_m, w) + b for _m in sent_out]
-        
+            raw_logits = tf.matmul(sent_out, w) + b 
         self.probabilities = tf.sigmoid(raw_logits)
-        self.cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(raw_logits, targets))
+        self.cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(raw_logits, self.targets))
 
         #Calculate gradients and propagate
         #Aggregation method 2 is really important for rnn per the tensorflow issues list
@@ -86,7 +86,6 @@ class TokModel():
         costs = []
         accuracy = []
         for step, (x,y,lengths) in enumerate(reader):
-            print(x.shape)
             num_data_points = len(x)
             feed_dict = {self.input_data:x, self.targets:y,
                          self.lengths:lengths}
@@ -101,9 +100,9 @@ class TokModel():
                 t0 = time()
 
             else:
+                print("Test step: ",step)
                 fetches =  self.probabilities
                 proba = session.run(fetches, feed_dict) 
-                print(proba.shape)
                 choice = np.where(proba > 0.5, 1, 0)
                 accuracy.append(np.mean(choice == y))
 
