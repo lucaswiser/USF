@@ -130,7 +130,7 @@ if __name__ == '__main__':
     if args.model == "tokrnn":
         from config import TokRNNConfig as Config
         Config.vocab_size = len(tok_map)
-        Config.num_steps = 10 if debug else Config.num_steps
+        Config.sent_len = 10 if debug else Config.num_steps
         stream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
                            rounded=True, training=True, limit=limit)
         validstream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     elif args.model == "charrnn":
         from config import CharRNNConfig as Config
         Config.vocab_size = len(char_map)
-        Config.num_steps =  10 if debug else Config.num_steps
+        Config.sent_len =  10 if debug else Config.num_steps
         stream = CharReader(Config.sent_len, Config.batch_size, char_map, random=True, 
                             rounded=True, training=True, limit=limit)
         validstream = CharReader(Config.sent_len, Config.batch_size, char_map, random=True, 

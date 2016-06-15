@@ -8,6 +8,14 @@ To set up:
     3) wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
     4) tar -zxvf aclImdb_v1.tar.gz
     5) pip install -R requirements.txt
+    6) open the python3 terminal and import nltk
+    7) nltk.download()
+    8) Enter: d
+    9) Enter: punkt
+    10) Enter: q
+    11) exit python
+    12) python3 preprocess.py
+    
 
 
 
