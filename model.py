@@ -162,12 +162,13 @@ class CNNModel():
                 pooled_outputs.append(pooled)
         h_pool = tf.concat(3, pooled_outputs)
         h_pool_flat = tf.reshape(h_pool, [-1, output_size])
+        conv_output = tf.nn.dropout(h_pool_flat, config.keep_prob)
 
 
         with tf.variable_scope("linear", reuse=None):
             w = tf.get_variable("w", [output_size, 1])
             b = tf.get_variable("b", [1])
-            raw_logits = tf.matmul(h_pool_flat, w) + b 
+            raw_logits = tf.matmul(conv_output, w) + b 
         self.probabilities = tf.sigmoid(raw_logits)
         self.cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(raw_logits, self.targets))
 

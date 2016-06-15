@@ -58,7 +58,7 @@ class TokReader():
         self.lengths = lengths
 
     def _shuffle(self):
-        logger.info("Suffling input data")
+        logger.info("Shuffling input data")
         inds = list(range(len(self.data)))
         if self.random:
             np.random.shuffle(inds)
@@ -124,7 +124,7 @@ class CharReader():
         self.lengths = lengths
 
     def _shuffle(self):
-        logger.info("Suffling input data")
+        logger.info("Shuffling input data")
         inds = list(range(len(self.data)))
         if self.random:
             np.random.shuffle(inds)
@@ -158,7 +158,7 @@ class CharTokReader():
         assert tok_map["*UNK*"] == 1, "The token mapping must contain *UNK* as the index 1"
 
     def _shuffle(self):
-        logger.info("Suffling input data")
+        logger.info("Shuffling input data")
         inds = list(range(len(self.data)))
         if self.random:
             np.random.suffle(inds)

@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
     if args.continue_training:
         assert args.saved_model_path and args.starting_index, "Wrong arguments see -h for details"
-        main(graph_path, Model, steam, validstream,
+        main(graph_path, Model, stream, validstream,
              continue_training=True, start_model=args.saved_model_path, 
              start_ind=args.starting_index, save_every=Config.save_every)
     else:
