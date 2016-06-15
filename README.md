@@ -15,7 +15,7 @@ To set up:
     10) Enter: q
     11) exit python
     12) python3 preprocess.py
-    
+    13) cp default_config.py config.py
 
 
 
