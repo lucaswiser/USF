@@ -5,9 +5,8 @@ import pickle
 import sys
 import argparse
 import logging
-from config import Config
-from model import TokModel
-from reader import TokReader
+from model import RNNModel, CNNModel, RNNConvModel, ConvRNNModel
+from reader import TokReader, CharReader, CharTokReader
 import logging
 logger = logging.getLogger("USF")
 logger.setLevel(logging.DEBUG)
@@ -18,16 +17,23 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 graph_path = 'graphs/'
 model_dir = "models/"
-with open('tok_map.pkl', 'rb') as f:
-    tok_map = pickle.load(f)
-Config.vocab_size = len(tok_map)
-limit = 500 if Config.debug else None
-tokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, 
-                      random=True, rounded=True, training=True, limit=limit)
-validtokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, 
-                           random=True, rounded=True, training=False, limit=limit)
+try:
+    with open('tok_map.pkl', 'rb') as f:
+        tok_map = pickle.load(f)
+    with open('char_map.pkl', 'rb') as f: 
+        char_map = pickle.load(f)
+except FileNotFoundError:
+    print("tok_map.pkl and char_map.pkl mappings not found. Please run preprocess.py")
+    sys.exit()
+assert tok_map["*PAD*"] == 0, "The token mapping must contain *PAD* as index 0"
+assert tok_map["*UNK*"] == 1, "The token mapping must contain *UNK* as the index 1"
+assert char_map["*PAD*"] == 0, "The token mapping must contain *PAD* as index 0"
+assert char_map["*UNK*"] == 1, "The token mapping must contain *UNK* as the index 1"
+assert char_map["*START*"] == 2, "The char mapping must contain *START* as the index 2"
+assert char_map["*END*"] == 3, "The char mapping must contain *END* as the index 3"
 
-def main(graph_path, continue_training=False, start_model=None, start_ind=0):
+
+def main(graph_path, Model, stream, validstream, continue_training=False, start_model=None, start_ind=0):
     """Run a complete training session. Will load a saved model to continue training
     if provided. After every epoch the current model will be saved, and the tensorboard
     will graph new data.
@@ -36,7 +42,7 @@ def main(graph_path, continue_training=False, start_model=None, start_ind=0):
         initializer = tf.random_uniform_initializer(-Config.init_scale,
                                                      Config.init_scale)
         with tf.variable_scope("model", reuse=None, initializer=initializer):
-            m = TokModel(config=Config)
+            m = Model(config=Config)
 
         tf.initialize_all_variables().run()
         saver = tf.train.Saver(max_to_keep=Config.num_models)
@@ -51,12 +57,12 @@ def main(graph_path, continue_training=False, start_model=None, start_ind=0):
         for i in range(start_ind, start_ind+Config.num_epochs):
             print("EPOCH: %s"%i)
             print("learning_rate: %s"%learning_rate)
-            epoch_cost, median_cost, max_cost = m.run_epoch(session, tokreader.get_sents(), True)   
+            epoch_cost, median_cost, max_cost = m.run_epoch(session, stream.get_sents(), True)   
             print("Total cost for EPOCH: %s"%i)
             print(epoch_cost)
             print("Median cost: %s"%median_cost)
             print("Max cost: %s"%max_cost)
-            accuracy = m.run_epoch(session, validtokreader.get_sents(), False)
+            accuracy = m.run_epoch(session, validstream.get_sents(), False)
             print("accuracy: %s"%accuracy)
             summ1 = tf.scalar_summary("epoch_cost", tf.constant(epoch_cost))
             summ2 = tf.scalar_summary("median_cost", tf.constant(median_cost))
@@ -106,15 +112,45 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--saved_model_path", help="Path to saved model to start training")
     parser.add_argument("-i", "--starting_index", help="Number to start training/saving from", type=int)
     parser.add_argument("-d", "--debug", help="Set this for logging.DEBUG", action='store_true')
+    parser.add_argument("model", help="""Which model to use, required. Options are tokrnn, charrnn, tokcnn, charcnn, chartokrnncnn, chartokcnnrnn""")
     args = parser.parse_args()
-    level = logging.DEBUG if args.debug else logging.INFO
+    
+    if args.debug:
+        level = logging.DEBUG
+        limit = 500
+    else:
+        level = logging.INFO
+        limit = None
     logging.getLogger().setLevel(level)
+    
     graph_path = graph_path + "/" + args.graph_sub_dir if args.graph_sub_dir else graph_path
+    
+    if args.model == "tokrnn":
+        from config import TokRNNConfig as Config
+        Config.vocab_size = len(tok_map)
+        stream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
+                           rounded=True, training=True, limit=limit)
+        validstream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
+                                rounded=True, training=False, limit=limit)
+        Model = RNNModel
+    elif args.model == "charrnn":
+        from config import CharRNNConfig as Config
+        Config.vocab_size = len(char_map)
+        stream = CharReader(Config.sent_len, Config.batch_size, char_map, random=True, 
+                            rounded=True, training=True, limit=limit)
+        validstream = CharReader(Config.sent_len, Config.batch_size, char_map, random=True, 
+                            rounded=True, training=False, limit=limit)
+        Model = RNNModel
+    else:
+        raise NotImplementedError("Only tokrnn and charrnn supported at this time")
+
     if args.continue_training:
         assert args.saved_model_path and args.starting_index, "Wrong arguments see -h for details"
-        main(graph_path, continue_training=True, start_model=args.saved_model_path, start_ind=args.starting_index)
+        main(graph_path, Model, steam, validstream,
+             continue_training=True, start_model=args.saved_model_path, 
+             start_ind=args.starting_index)
     else:
-        main(graph_path)
+        main(graph_path, Model, stream, validstream)
 
 
 

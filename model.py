@@ -6,7 +6,7 @@ import tensorflow as tf
 from tensorflow.models.rnn import rnn_cell
 from tensorflow.models.rnn import rnn
 
-class TokModel():
+class RNNModel():
     def __init__(self, config):
         sent_len = config.sent_len
         batch_size = config.batch_size
@@ -112,6 +112,18 @@ class TokModel():
             return total_cost, np.median(costs), np.max(costs)
         return np.mean(accuracy)
    
+
+
+
+class CNNModel():
+    pass
+
+
+class RNNConvModel():
+    pass
+
+class ConvRNNModel():
+    pass
 
 
 

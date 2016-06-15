@@ -1,3 +1,7 @@
 aclImdb*
 *.pkl
 env*
+__pycache__
+models/*
+config.py
+graphs/*
