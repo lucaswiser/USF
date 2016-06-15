@@ -61,7 +61,7 @@ class RNNModel():
         #Aggregation method 2 is really important for rnn per the tensorflow issues list
         tvars = tf.trainable_variables()
         self.lr = tf.Variable(0.0, trainable=False) #Assign to overwrite
-        optimizer = tf.train.GradientDescentOptimizer(self.lr) 
+        optimizer = tf.train.AdamOptimizer()
         grads, _vars = zip(*optimizer.compute_gradients(self.cost, tvars, aggregation_method=2))
         grads, self.grad_norm = tf.clip_by_global_norm(grads,
                                       config.max_grad_norm)
@@ -121,7 +121,7 @@ class CNNModel():
         batch_size = config.batch_size
         vocab_size = config.vocab_size
         embed_size = config.embed_size
-        filter_size = config.filter_size
+        filter_sizes = config.filter_sizes
         num_filters = config.num_filters
         if len(num_filters) == 1:
             num_filters = num_filters*len(filter_sizes)
@@ -143,7 +143,7 @@ class CNNModel():
             with tf.name_scope("conv-maxpool-%s" %(filter_size)):
                 filter_shape = [filter_size, embed_size, 1, num_filters[i]]
                 W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1, name="W"))
-                b = tf.Variable(tf.constant(0.1, shape=[temp_num_filters]), name="b")
+                b = tf.Variable(tf.constant(0.1, shape=[num_filters[i]]), name="b")
                 conv = tf.nn.conv2d(
                     inputs_expanded,
                     W,
@@ -160,14 +160,14 @@ class CNNModel():
                     padding='VALID',
                     name="pool")
                 pooled_outputs.append(pooled)
-        self.h_pool = tf.concat(3, pooled_outputs)
-        self.h_pool_flat = tf.reshape(self.h_pool, [-1, output_size])
+        h_pool = tf.concat(3, pooled_outputs)
+        h_pool_flat = tf.reshape(h_pool, [-1, output_size])
 
 
         with tf.variable_scope("linear", reuse=None):
             w = tf.get_variable("w", [output_size, 1])
             b = tf.get_variable("b", [1])
-            raw_logits = tf.matmul(sent_out, w) + b 
+            raw_logits = tf.matmul(h_pool_flat, w) + b 
         self.probabilities = tf.sigmoid(raw_logits)
         self.cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(raw_logits, self.targets))
 
@@ -201,8 +201,7 @@ class CNNModel():
         accuracy = []
         for step, (x,y,lengths) in enumerate(reader):
             num_data_points = len(x)
-            feed_dict = {self.input_data:x, self.targets:y,
-                         self.lengths:lengths}
+            feed_dict = {self.input_data:x, self.targets:y}
             if training:
                 fetches =  [self.cost, self.grad_norm, self.train_op]
                 cost, grad_norm, _  = session.run(fetches, feed_dict)
