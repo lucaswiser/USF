@@ -10,7 +10,7 @@ neg_test_dir = 'aclImdb/test/neg/'
 pos_test_dir = 'aclImdb/test/pos/'
 
 class TokReader():
-    def __init__(self, sent_len, batch_size, tok_map, random=True, rounded=True, training=True):
+    def __init__(self, sent_len, batch_size, tok_map, random=True, rounded=True, training=True, limit=None):
         assert sent_len % 2 == 0, "Sent len must be an even number"
         assert tok_map["*PAD*"] == 0, "The token mapping must contain *PAD* as index 0"
         assert tok_map["*UNK*"] == 1, "The token mapping must contain *UNK* as the index 1"
@@ -21,6 +21,7 @@ class TokReader():
         self.random = random
         self.rounded = rounded
         self.training = training
+        self.limit = limit
         self._load()
 
     def _load(self):
@@ -34,9 +35,9 @@ class TokReader():
         data = []
         labels = []
         lengths = []
-        for f in pos_files+neg_files:
+        for i,f in enumerate(pos_files+neg_files):
             with open(f) as _:
-                sents = f.read().split("<br /><br />")
+                sents = _.read().split("<br /><br />")
             for s in sents:
                 index = [self.tok_map.get(t, 1) for t in nltk.tokenize.word_tokenize(s.lower())]
                 lengths.append(min(len(index), self.sent_len))
@@ -49,6 +50,8 @@ class TokReader():
                 parsed_label = int((f.split("_")[-1]).split(".")[0])
                 data.append(index)
                 labels.append(parsed_label // 6 if self.rounded else parsed_label)
+            if self.limit and i > self.limit:
+                break
         self.data = data
         self.labels = labels
         self.lengths = lengths

@@ -8,12 +8,18 @@ import logging
 from config import Config
 from model import TokModel
 from reader import TokReader
+import logging
+logger = logging.getLogger("USF")
+logger.setLevel(logging.DEBUG)
 graph_path = 'graphs/'
 model_dir = "models/"
 with open('tok_map.pkl', 'rb') as f:
     tok_map = pickle.load(f)
-tokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, rounded=True, training=True)
-validtokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, rounded=True, training=False)
+limit = 500 if Config.debug else None
+tokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, 
+                      random=True, rounded=True, training=True, limit=limit)
+validtokreader = TokReader(Config.sent_len, Config.batch_size, tok_map, 
+                           random=True, rounded=True, training=False, limit=limit)
 
 def main(graph_path, continue_training=False, start_model=None, start_ind=0):
     """Run a complete training session. Will load a saved model to continue training
