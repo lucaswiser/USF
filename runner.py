@@ -144,6 +144,16 @@ if __name__ == '__main__':
         validstream = CharReader(Config.sent_len, Config.batch_size, char_map, random=True, 
                             rounded=True, training=False, limit=limit)
         Model = RNNModel
+    elif args.model == "tokcnn":
+        from config import TokCNNConfig as Config
+        Config.vocab_size = len(tok_map)
+        Config.sent_len = 10 if debug else Config.sent_len
+        stream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
+                           rounded=True, training=True, limit=limit)
+        validstream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
+                                rounded=True, training=False, limit=limit)
+        Model = CNNModel
+
     else:
         raise NotImplementedError("Only tokrnn and charrnn supported at this time")
 
