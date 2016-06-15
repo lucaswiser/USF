@@ -50,7 +50,7 @@ def main(graph_path, Model, stream, validstream, continue_training=False,
         if continue_training:
             print("Continuing training from saved model ",start_model)
             saver.restore(session,start_model)
-        writer = tf.train.SummaryWriter(graph_path, max_queue=1) 
+        writer = tf.train.SummaryWriter(graph_path, max_queue=3) 
         last3 = []
         learning_rate = Config.learning_rate
         session.run(tf.assign(m.lr, learning_rate))
@@ -72,7 +72,6 @@ def main(graph_path, Model, stream, validstream, continue_training=False,
             summ5 = tf.scalar_summary("accuracy", tf.constant(accuracy))
             merge = tf.merge_summary([summ1, summ2, summ3, summ4, summ5])
             writer.add_summary(merge.eval(), i)
-            writer.flush()
             if i % save_every == 0:
                 saver.save(session, model_dir + 'saved-lstm-model', global_step=i)
             if len(last3) == 3:
