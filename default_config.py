@@ -11,6 +11,7 @@ class TokRNNConfig:
     embed_size = 256
     num_models = 100
     num_epochs = 100
+    save_every = 10
     debug = False
 
 class CharRNNConfig:
@@ -26,4 +27,5 @@ class CharRNNConfig:
     embed_size = 64
     num_models = 100
     num_epochs = 100
+    save_every = 5
     debug = False

@@ -33,7 +33,8 @@ assert char_map["*START*"] == 2, "The char mapping must contain *START* as the i
 assert char_map["*END*"] == 3, "The char mapping must contain *END* as the index 3"
 
 
-def main(graph_path, Model, stream, validstream, continue_training=False, start_model=None, start_ind=0):
+def main(graph_path, Model, stream, validstream, continue_training=False, 
+        start_model=None, start_ind=0, save_every=1):
     """Run a complete training session. Will load a saved model to continue training
     if provided. After every epoch the current model will be saved, and the tensorboard
     will graph new data.
@@ -72,7 +73,7 @@ def main(graph_path, Model, stream, validstream, continue_training=False, start_
             merge = tf.merge_summary([summ1, summ2, summ3, summ4, summ5])
             writer.add_summary(merge.eval(), i)
             writer.flush()
-            if i % 1 == 0:
+            if i % save_every == 0:
                 saver.save(session, model_dir + 'saved-lstm-model', global_step=i)
             if len(last3) == 3:
                 h = max(last3)
@@ -151,9 +152,9 @@ if __name__ == '__main__':
         assert args.saved_model_path and args.starting_index, "Wrong arguments see -h for details"
         main(graph_path, Model, steam, validstream,
              continue_training=True, start_model=args.saved_model_path, 
-             start_ind=args.starting_index)
+             start_ind=args.starting_index, save_every=Config.save_every)
     else:
-        main(graph_path, Model, stream, validstream)
+        main(graph_path, Model, stream, validstream, save_every=Config.save_every)
 
 
 

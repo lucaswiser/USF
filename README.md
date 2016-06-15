@@ -6,7 +6,7 @@ To set up:
     1) clone this directory
     2) cd USF/
     3) wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
-    4) tar -zxvf 
+    4) tar -zxvf aclImdb_v1.tar.gz
     5) pip install -R requirements.txt
 
 
