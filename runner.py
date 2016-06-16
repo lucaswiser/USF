@@ -5,7 +5,7 @@ import pickle
 import sys
 import argparse
 import logging
-from model import RNNModel, CNNModel, RNNConvModel, ConvRNNModel
+from model import RNNModel, CNNModel, RNNConvModel, RNNRNNModel
 from reader import TokReader, CharReader, CharTokReader
 import logging
 logger = logging.getLogger("USF")
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--saved_model_path", help="Path to saved model to start training")
     parser.add_argument("-i", "--starting_index", help="Number to start training/saving from", type=int)
     parser.add_argument("-d", "--debug", help="Set this for logging.DEBUG", action='store_true')
-    parser.add_argument("model", help="""Which model to use, required. Options are tokrnn, charrnn, tokcnn, charcnn, chartokrnncnn, chartokcnnrnn""")
+    parser.add_argument("model", help="""Which model to use, required. Options are tokrnn, charrnn, tokcnn, charcnn, chartokrnn, chartokcnnrnn""")
     args = parser.parse_args()
     debug = args.debug
     
@@ -153,7 +153,26 @@ if __name__ == '__main__':
         validstream = TokReader(Config.sent_len, Config.batch_size, tok_map, random=True, 
                                 rounded=True, training=False, limit=limit)
         Model = CNNModel
-
+    elif args.model == "charcnn":
+        from config import CharCNNConfig as Config
+        Config.vocab_size = len(char_map)
+        Config.sent_len = 10 if debug else Config.sent_len
+        stream = TokReader(Config.sent_len, Config.batch_size, char_map, random=True, 
+                           rounded=True, training=True, limit=limit)
+        validstream = TokReader(Config.sent_len, Config.batch_size, char_map, random=True, 
+                                rounded=True, training=False, limit=limit)
+        Model = CNNModel
+    elif args.model == "chartokrnn":
+        from config import CharTokRNNConfig as Config
+        Config.vocab_size = len(char_map)
+        Config.sent_len = 10 if debug else Config.sent_len
+        Config.word_len = 10 if debug else Config.word_len
+        Config.batch_size = 10 if debug else Config.batch_size
+        stream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
+                               char_map, random=True, rounded=True, training=True, limit=limit)
+        validstream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
+                                    char_map, random=True, rounded=True, training=False, limit=limit)
+        Model = RNNRNNModel
     else:
         raise NotImplementedError("Only tokrnn and charrnn supported at this time")
 
