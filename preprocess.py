@@ -55,10 +55,12 @@ def main():
     print("Extracting characters")
     extract_char_counts(neg_dir, char_counter)
     extract_char_counts(pos_dir, char_counter)
+    print("Vocab size: %s"%len(tok_counter))
     print("10 most common words:")
     print(tok_counter.most_common(10))
     print("10 least common words:")
     print(tok_counter.most_common()[-10:][::-1])
+    print("Char vocab size: %s"%len(char_counter))
     print("10 most common characters")
     print(char_counter.most_common(10))
     print("10 least common characters")
@@ -72,7 +74,7 @@ def main():
         tok_inv_map[i] = tok
     word_index = 2
     for tok, count in tok_counter.items():
-        if count > 1:
+        if count > 10:
             tok_map[tok] = word_index
             tok_inv_map[word_index] = tok
             word_index += 1
@@ -84,10 +86,13 @@ def main():
         char_inv_map[i] = c
     char_index = 2
     for c, count in char_counter.items():
-        if count > 1:
+        if count > 10:
             char_map[c] = char_index
             char_inv_map[char_index] = c
             char_index += 1
+
+    print("Tok vocab size after removing words that appear less than 10 times: ", len(tok_map))
+    print("Char vocab size after removing characters that appear less than 10 times: ", len(char_map))
 
     print("Saving mappings")
     with open('tok_map.pkl','wb') as f:
