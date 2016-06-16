@@ -53,7 +53,7 @@ class RNNModel():
 
         with tf.variable_scope("linear", reuse=None):
             w = tf.get_variable("w", [output_size, 1])
-            b = tf.get_variable("b", [1])
+            b = tf.get_variable("b", [1], initializer=tf.constant_initializer(0.0))
             raw_logits = tf.matmul(sent_out, w) + b 
         self.probabilities = tf.sigmoid(raw_logits)
         self.cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(raw_logits, self.targets))
