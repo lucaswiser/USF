@@ -27,8 +27,8 @@ class RNNModel():
 
         #LSTM 1 -> Encode the characters of every tok into a fixed dense representation
         with tf.variable_scope("rnn1", reuse=None):
-            cell = rnn_cell.LSTMCell(state_size, input_size=embed_size, initializer=tf.contrib.layers.xavier_initializer)
-            back_cell = rnn_cell.LSTMCell(state_size, input_size=embed_size, initializer=tf.contrib.layers.xavier_initializer)
+            cell = rnn_cell.LSTMCell(state_size, input_size=embed_size, initializer=tf.contrib.layers.xavier_initializer())
+            back_cell = rnn_cell.LSTMCell(state_size, input_size=embed_size, initializer=tf.contrib.layers.xavier_initializer())
             cell = rnn_cell.DropoutWrapper(
               cell, input_keep_prob=keep_prob,
                          output_keep_prob=keep_prob)
