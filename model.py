@@ -62,7 +62,7 @@ class RNNModel():
         #Aggregation method 2 is really important for rnn per the tensorflow issues list
         tvars = tf.trainable_variables()
         self.lr = tf.Variable(0.0, trainable=False) #Assign to overwrite
-        optimizer = tf.train.GradientDescentOptimizer(self.lr)
+        optimizer = tf.train.MomentumOptimizer(self.lr, 0.9)
         grads, _vars = zip(*optimizer.compute_gradients(self.cost, tvars, aggregation_method=2))
         grads, self.grad_norm = tf.clip_by_global_norm(grads,
                                       config.max_grad_norm)
