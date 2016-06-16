@@ -1,5 +1,6 @@
 Tensorflow demo using the Large Movie Review Dataset from http://ai.stanford.edu/~amaas/data/sentiment/
 
+python3, tensorflow-0.8, nltk
 
 To set up:
 
