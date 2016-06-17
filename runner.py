@@ -112,7 +112,7 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--saved_model_path", help="Path to saved model to start training")
     parser.add_argument("-i", "--starting_index", help="Number to start training/saving from", type=int)
     parser.add_argument("-d", "--debug", help="Set this for logging.DEBUG", action='store_true')
-    parser.add_argument("model", help="""Which model to use, required. Options are tokrnn, charrnn, tokconv, charconv, chartokrnn, chartokrnnconv""")
+    parser.add_argument("model", help="""Which model to use, required. Options are tokrnn, charrnn, tokconv, charconv""")
     args = parser.parse_args()
     debug = args.debug
     
@@ -166,28 +166,6 @@ if __name__ == '__main__':
         validstream = TokReader(Config.sent_len, Config.batch_size, char_map, random=True, 
                                 rounded=True, training=False, limit=limit)
         Model = CNNModel
-    elif args.model == "chartokrnn":
-        from config import CharTokRNNConfig as Config
-        Config.vocab_size = len(char_map)
-        Config.sent_len = 10 if debug else Config.sent_len
-        Config.word_len = 10 if debug else Config.word_len
-        Config.batch_size = 10 if debug else Config.batch_size
-        stream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
-                               char_map, random=True, rounded=True, training=True, limit=limit)
-        validstream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
-                                    char_map, random=True, rounded=True, training=False, limit=limit)
-        Model = RNNRNNModel
-    elif args.model == "chartokrnnconv":
-        from config import CharTokRNNConvConfig as Config
-        Config.vocab_size = len(char_map)
-        Config.sent_len = 10 if debug else Config.sent_len
-        Config.word_len = 10 if debug else Config.word_len
-        Config.batch_size = 10 if debug else Config.batch_size
-        stream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
-                               char_map, random=True, rounded=True, training=True, limit=limit)
-        validstream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
-                                    char_map, random=True, rounded=True, training=False, limit=limit)
-        Model = RNNConvModel
     else:
         raise NotImplementedError("Only tokrnn and charrnn supported at this time")
 
