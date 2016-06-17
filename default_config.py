@@ -78,24 +78,5 @@ class CharTokRNNConfig:
     num_epochs = 100
     save_every = 5
 
-class CharTokRNNConvConfig:
-    init_scale = 0.05
-    learning_rate = 0.1
-    max_grad_norm = 5
-    batch_size = 256
-    sent_len = 100
-    word_len = 10
-    num_layers1 = 1
-    num_layers2 = 1
-    keep_prob1 = 0.5
-    keep_prob2 = 0.5
-    vocab_size = None #Set when you load char_map
-    state_size1 = 32
-    embed_size = 32
-    filter_sizes = [3]
-    num_filters = [100]
-    num_models = 100
-    num_epochs = 100
-    save_every = 5
 
 

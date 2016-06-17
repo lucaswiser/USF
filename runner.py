@@ -5,7 +5,7 @@ import pickle
 import sys
 import argparse
 import logging
-from model import RNNModel, CNNModel, RNNConvModel, RNNRNNModel
+from model import RNNModel, CNNModel, RNNRNNModel
 from reader import TokReader, CharReader, CharTokReader
 import logging
 logger = logging.getLogger("USF")
@@ -166,6 +166,17 @@ if __name__ == '__main__':
         validstream = TokReader(Config.sent_len, Config.batch_size, char_map, random=True, 
                                 rounded=True, training=False, limit=limit)
         Model = CNNModel
+    elif args.model == "chartokrnn":
+        from config import CharTokRNNConfig as Config
+        Config.vocab_size = len(char_map)
+        Config.sent_len = 10 if debug else Config.sent_len
+        Config.word_len = 10 if debug else Config.word_len
+        Config.batch_size = 10 if debug else Config.batch_size
+        stream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
+                               char_map, random=True, rounded=True, training=True, limit=limit)
+        validstream = CharTokReader(Config.sent_len, Config.word_len, Config.batch_size, 
+                                    char_map, random=True, rounded=True, training=False, limit=limit)
+        Model = RNNRNNModel
     else:
         raise NotImplementedError("Only tokrnn and charrnn supported at this time")
 
