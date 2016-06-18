@@ -178,7 +178,7 @@ if __name__ == '__main__':
                                     char_map, random=True, rounded=True, training=False, limit=limit)
         Model = RNNRNNModel
     else:
-        raise NotImplementedError("Only tokrnn and charrnn supported at this time")
+        raise NotImplementedError("See -h for details on which modes are supported")
 
     if args.continue_training:
         assert args.saved_model_path and args.starting_index, "Wrong arguments see -h for details"
