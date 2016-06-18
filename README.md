@@ -1,5 +1,8 @@
 Tensorflow demo using the Large Movie Review Dataset from http://ai.stanford.edu/~amaas/data/sentiment/
 
+All of these models predict sentiment from movie reviews. 
+
+
 python3, tensorflow-0.8, nltk
 
 To set up:
@@ -23,7 +26,19 @@ To set up:
 
 
 
+To run a model:
+    python runner.py [command] [-d]
 
+Where command is either:
+    tokrnn to run the token (word embedding) RNN 
+    charrnn to run the character level rnn
+    tokcnn to run a token conv net
+    charcnn to run a character conv net
+    chartokrnn to run the hierarchical char -> token RNN model
+
+Options -d runs the model in debug mode, which will make all of the size parameters small so the model compiles fast. This is especially important when setting up a large RNN because compiling the graph takes a long time. Run it with -d to make sure that nothing breaks and then stop and run the real model.
+
+This will run on a GPU or CPU.
 
 
 
