@@ -32,8 +32,8 @@ To run a model:
 Where command is either:
     tokrnn to run the token (word embedding) RNN 
     charrnn to run the character level rnn
-    tokcnn to run a token conv net
-    charcnn to run a character conv net
+    tokconv to run a token conv net
+    charconv to run a character conv net
     chartokrnn to run the hierarchical char -> token RNN model
 
 Options -d runs the model in debug mode, which will make all of the size parameters small so the model compiles fast. This is especially important when setting up a large RNN because compiling the graph takes a long time. Run it with -d to make sure that nothing breaks and then stop and run the real model.
